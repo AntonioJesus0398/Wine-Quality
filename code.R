@@ -19,21 +19,21 @@ measures = function(x)
   )
 }
 
-display = function(x)
+display = function(x, title)
 {
-  boxplot(x, horizontal = TRUE, col = "orange")
-  hist(x)
+  boxplot(x, horizontal = TRUE, col = "orange", xlab = title)
+  hist(x, main = paste("Histogram of ", title), xlab = title)
 }
 
-analize = function(x)
+analize = function(x, title)
 {
   print(measures(x))
-  display(x)
+  display(x, title)
 }
 
-analize(wine_table$quality)
-analize(wine_table$pH)
-analize(wine_table$alcohol)
+analize(wine_table$quality, "wine quality")
+analize(wine_table$pH, "wine pH")
+analize(wine_table$alcohol, "wine alcohol")
 
 #Exercise 2
 
@@ -41,29 +41,31 @@ analize(wine_table$alcohol)
 p <- rnorm(500, 0, 1)
 
 #generate 4 samples without replace
-s1 <- sample(p, size = 300)
-s2 <- sample(p, size = 40)
-s3 <- sample(p, size = 30)
-s4 <- sample(p, size = 20)
+s300 <- sample(p, size = 300)
+s40 <- sample(p, size = 40)
+s30 <- sample(p, size = 30)
+s20 <- sample(p, size = 20)
 
 #generate 4 samples with replace
-sr1 <- sample(p, size = 300, replace = TRUE)
-sr2 <- sample(p, size = 40, replace = TRUE)
-sr3 <- sample(p, size = 30, replace = TRUE)
-sr4 <- sample(p, size = 20, replace = TRUE)
+sr300 <- sample(p, size = 300, replace = TRUE)
+sr40 <- sample(p, size = 40, replace = TRUE)
+sr30 <- sample(p, size = 30, replace = TRUE)
+sr20 <- sample(p, size = 20, replace = TRUE)
 
 
-analize(s1)
-analize(s2)
-analize(s3)
-analize(s4)
+analize(s300, "s300")
+analize(sr300, "sr300")
 
-analize(sr1)
-analize(sr2)
-analize(sr3)
-analize(sr4)
+analize(s40, "s40")
+analize(sr40, "sr40")
 
-analize(p)
+analize(s30, "s30")
+analize(sr30, "sr30")
+
+analize(s20, "s20")
+analize(sr20, "sr20")
+
+analize(p, "population")
 
 library(glue)
 
@@ -109,29 +111,30 @@ variance_confidence_interval = function(s, alpha)
   glue("Variance confidence interval with confidence level {alpha}:\nLeft bound: {left}\nRight bound: {right}")
 }
 
-mean_confidence_interval(s1, 0.01)
-variance_confidence_interval(s1, 0.01)
+mean_confidence_interval(s300, 0.01)
+variance_confidence_interval(s300, 0.01)
 
-mean_confidence_interval(s2, 0.01)
-variance_confidence_interval(s2, 0.01)
+mean_confidence_interval(sr300, 0.01)
+variance_confidence_interval(sr300, 0.01)
 
-mean_confidence_interval(s3, 0.01)
-variance_confidence_interval(s3, 0.01)
+mean_confidence_interval(s40, 0.01)
+variance_confidence_interval(s40, 0.01)
 
-mean_confidence_interval(s4, 0.01)
-variance_confidence_interval(s4, 0.01)
+mean_confidence_interval(sr40, 0.01)
+variance_confidence_interval(sr40, 0.01)
 
-mean_confidence_interval(sr1, 0.01)
-variance_confidence_interval(sr1, 0.01)
 
-mean_confidence_interval(sr2, 0.01)
-variance_confidence_interval(sr2, 0.01)
+mean_confidence_interval(s30, 0.01)
+variance_confidence_interval(s30, 0.01)
 
-mean_confidence_interval(sr3, 0.01)
-variance_confidence_interval(sr3, 0.01)
+mean_confidence_interval(sr30, 0.01)
+variance_confidence_interval(sr30, 0.01)
 
-mean_confidence_interval(sr4, 0.01)
-variance_confidence_interval(sr4, 0.01)
+mean_confidence_interval(s20, 0.01)
+variance_confidence_interval(s20, 0.01)
+
+mean_confidence_interval(sr20, 0.01)
+variance_confidence_interval(sr20, 0.01)
 
 
 #Exercise #3
@@ -139,4 +142,16 @@ variance_confidence_interval(sr4, 0.01)
 white_wine <- subset(wine_table, color == "white")
 red_wine <- subset(wine_table, color == "red")
 
-t.test(red_wine$fixed.acidity, white_wine$fixed.acidity, alternative = "greater", conf.level = 0.01)
+x <- white_wine$fixed.acidity
+y <- red_wine$fixed.acidity
+
+v <- var.test(x, y, conf.level = 0.995)
+v
+
+if (v$p.value < 0.1)
+{
+  t.test(x, y, alternative = "less", conf.level = 0.995, var.equal = TRUE)
+}else
+{
+  t.test(x, y, alternative = "less", conf.level = 0.995, var.equal = FALSE)
+}
